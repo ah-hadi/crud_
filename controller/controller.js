@@ -20,9 +20,11 @@ function upload(req, res) {
 function signup(req, res) {
   // console.log(res.path);
   // let path = res.path;
+  // console.log("entered");
   let email = req.body.email;
   let password = req.body.password;
   let role = req.body.role;
+  console.log(role);
   // let image = req.file.path;
   // console.log(image);
   let value = new model({
@@ -33,7 +35,9 @@ function signup(req, res) {
   });
   // value.save();
   // res.send("done");
+  // console.log("idhar");
   if (role == "admin") {
+    console.log("yaha");
     value.save();
   } else if (email == "" && password == "") {
     return res.status(404).send("please enter valid credentials");
@@ -49,6 +53,7 @@ function signup(req, res) {
 //------------------------login------------------------//
 
 async function login(req, res) {
+  console.log("login");
   let email = req.body.email;
   let password = req.body.password;
   let role = req.body.role;
@@ -77,6 +82,7 @@ async function login(req, res) {
   ) {
     const token = jwt.sign(value, "my super secret key");
     res.send({ message: "welcome admin", token });
+    // console.log(token);
   } else if (
     user.email == email &&
     user.password == password &&
@@ -84,6 +90,7 @@ async function login(req, res) {
   ) {
     const token = jwt.sign(value, "my super secret key");
     res.send({ message: "welcome user", token });
+    // console.log(token);
   } else {
     return res.status(404).json({
       message: "not-found",
@@ -154,13 +161,16 @@ async function deleteuser(req, res) {
 //-------------------admin can update user
 async function update(req, res) {
   const _id = req.params.id;
+  console.log(_id);
   let password = req.body.password;
   let email = req.body.email;
   let updateObj = {
     password: password,
     email: email,
   };
+  console.log(updateObj);
   let useremail = req.email;
+  console.log(useremail);
   let data = await model.findOne({ email: useremail });
   if (data.role == "admin") {
     model.findByIdAndUpdate(_id, updateObj, function (err, model) {
@@ -178,10 +188,16 @@ async function update(req, res) {
 //-----------------viewusers
 
 async function viewusers(req, res) {
+  // console.log("hello");
   let useremail = req.email;
+  // console.log(useremail);
   let data = await model.findOne({ email: useremail });
+  // console.log(data);
   let users = await model.find({ adminid: data._id });
+  // console.log(users);
   if (data.role == "admin") {
+    //middilware
+    // console.log(users);
     res.send(users);
   } else {
     return res.status(404).send("unauthorize");
@@ -210,6 +226,17 @@ async function userupdate(req, res) {
     return res.status(404).send("unautorize");
   }
 }
+
+async function redirect(req, res) {
+  let role = req.role;
+  // res.status(200).json({ role: role });
+  let email = req.email;
+  console.log(email);
+  let data = await model.findOne({ email: email });
+  console.log(data);
+  let id = data._id;
+  return res.status(200).json({ id: id, role: role });
+}
 module.exports = {
   signup,
   login,
@@ -219,4 +246,5 @@ module.exports = {
   deleteuser,
   userupdate,
   upload,
+  redirect,
 };

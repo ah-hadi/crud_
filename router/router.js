@@ -1,8 +1,9 @@
 var express = require("express");
 const controller = require("../controller/controller");
-const { user, onlyuser } = require("../middleware/middleware");
+const { user, onlyuser, userredirect } = require("../middleware/middleware");
 const multer = require("multer");
 const { dirname } = require("path");
+const { Router } = require("express");
 
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -40,6 +41,7 @@ route.get("/viewusers", user, controller.viewusers);
 route.delete("/deleteuser/:id", user, controller.deleteuser);
 route.patch("/userupdate/:id", user, controller.update);
 route.patch("/update/:id", onlyuser, controller.userupdate);
+route.get("/redirect", userredirect, controller.redirect);
 //----------------------multer route
 route.post(
   "/upload",
